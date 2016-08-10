@@ -23,49 +23,50 @@ var googleUser = {};
 var cid = getMetaContent('google-signin-client_id');
 var hd = getMetaContent('google-signin-hosted_domain');
 var startApp = function() {
-  gapi.load('auth2', function(){
-    auth2 = gapi.auth2.init({
-      client_id: cid,
-      cookiepolicy: 'single_host_origin',
-      hosted_domain: hd
+    gapi.load('auth2', function() {
+        auth2 = gapi.auth2.init({
+            client_id: cid,
+            cookiepolicy: 'single_host_origin',
+            hosted_domain: hd
+        });
+        var button = document.getElementById('g-signin-button');
+        if (button) {
+            attachSignin(button);
+        }
     });
-    var button = document.getElementById('g-signin-button');
-    if (button) {
-        attachSignin(button);
-    }
-  });
 };
 
 
 
+
 function attachSignin(element) {
-  auth2.attachClickHandler(element, {},
-      function(googleUser) {
+    auth2.attachClickHandler(element, {}, function(googleUser) {
 
         var profile = googleUser.getBasicProfile();
         var name = profile.getName();
         var email = profile.getEmail();
 
-	var response = googleUser.getAuthResponse();
-	var id_token = response['id_token'];
-	var access_token = response['access_token'];
+        var response = googleUser.getAuthResponse();
+        var id_token = response['id_token'];
+        var access_token = response['access_token'];
 
-	$.ajax({
-	type: 'POST',
-       	url:'/user/login',
-	data: {name: name, email: email, id_token: id_token, token: access_token},
-       	success: function(res, status, xhr) {
-        	window.location.replace("/dashboard");
-       	},
-       	error: function(xhr, status, err) {
-         	alert("Login failure: " + err);
-       }
-     });
+        $.ajax({
+            type: 'POST',
+            url: '/user/login',
+            data: { name: name, email: email, id_token: id_token, token: access_token },
+            success: function(res, status, xhr) {
+                window.location.replace("/dashboard");
+            },
+            error: function(xhr, status, err) {
+                alert("Login failure: " + err);
+            }
+        });
 
-      }, function(error) {
+    }, function(error) {
+        console.log(error);
+        alert("error!");
 
-
-      });
+    });
 
 }
 
@@ -73,11 +74,11 @@ function attachSignin(element) {
 
 /*get content from meta tag*/
 function getMetaContent(propName) {
-  var metas = document.getElementsByTagName('meta');
-  for (i = 0; i < metas.length; i++) {
-	if (metas[i].getAttribute("name") == propName) {
-		return metas[i].getAttribute("content");
-	}
-  }
-  return "";
+    var metas = document.getElementsByTagName('meta');
+    for (i = 0; i < metas.length; i++) {
+        if (metas[i].getAttribute("name") == propName) {
+            return metas[i].getAttribute("content");
+        }
+    }
+    return "";
 }
