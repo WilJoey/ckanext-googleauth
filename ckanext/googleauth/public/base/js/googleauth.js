@@ -64,8 +64,6 @@ function attachSignin(element) {
 
     }, function(error) {
         console.log(error);
-        alert("error!");
-
     });
 
 }
